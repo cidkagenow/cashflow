@@ -1,7 +1,7 @@
 'use client';
 
 import { Card } from '@/components/ui/card';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 interface AnalystData {
   name: string;
@@ -10,21 +10,19 @@ interface AnalystData {
   exigible: number;
 }
 
-const data: AnalystData[] = [
-  { name: 'María López', efectividad: 92, cobrado: 45000, exigible: 50000 },
-  { name: 'Carlos Ruiz', efectividad: 87, cobrado: 38000, exigible: 45000 },
-  { name: 'Ana González', efectividad: 95, cobrado: 52000, exigible: 55000 },
-  { name: 'Juan Pérez', efectividad: 78, cobrado: 28000, exigible: 36000 },
-  { name: 'Laura Martín', efectividad: 88, cobrado: 41000, exigible: 48000 },
-];
-
 const getColor = (value: number) => {
   if (value >= 90) return '#10b981';
   if (value >= 80) return '#3b82f6';
   return '#f59e0b';
 };
 
-export function EffectivenessChart() {
+export function EffectivenessChart({ data }: { data?: AnalystData[] }) {
+  if (!data || data.length === 0) return null;
+
+  const avg = Math.round(data.reduce((s, d) => s + d.efectividad, 0) / data.length);
+  const best = data.reduce((a, b) => a.efectividad > b.efectividad ? a : b);
+  const worst = data.reduce((a, b) => a.efectividad < b.efectividad ? a : b);
+
   return (
     <Card className="p-6 bg-white dark:bg-slate-900">
       <div className="mb-6">
@@ -43,7 +41,7 @@ export function EffectivenessChart() {
             stroke="#6b7280"
           />
           <YAxis stroke="#6b7280" label={{ value: 'Efectividad (%)', angle: -90, position: 'insideLeft' }} />
-          <Tooltip 
+          <Tooltip
             formatter={(value) => `${value}%`}
             contentStyle={{
               backgroundColor: '#fff',
@@ -61,15 +59,15 @@ export function EffectivenessChart() {
       <div className="mt-6 grid grid-cols-3 gap-4">
         <div className="text-center">
           <p className="text-xs text-gray-600 dark:text-gray-400">Efectividad Promedio</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">88%</p>
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{avg}%</p>
         </div>
         <div className="text-center">
           <p className="text-xs text-gray-600 dark:text-gray-400">Mejor Desempeño</p>
-          <p className="text-2xl font-bold text-green-600 dark:text-green-500">95% (Ana G.)</p>
+          <p className="text-2xl font-bold text-green-600 dark:text-green-500">{best.efectividad}% ({best.name.split(' ')[0]})</p>
         </div>
         <div className="text-center">
           <p className="text-xs text-gray-600 dark:text-gray-400">Por Mejorar</p>
-          <p className="text-2xl font-bold text-orange-600 dark:text-orange-500">78% (Juan P.)</p>
+          <p className="text-2xl font-bold text-orange-600 dark:text-orange-500">{worst.efectividad}% ({worst.name.split(' ')[0]})</p>
         </div>
       </div>
     </Card>

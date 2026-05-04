@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { KPICard } from '@/components/dashboard/kpi-card';
 import { AlertItem } from '@/components/dashboard/alert-item';
@@ -7,30 +8,99 @@ import { ReconciliationItem } from '@/components/dashboard/reconciliation-item';
 import { EffectivenessChart } from '@/components/dashboard/effectiveness-chart';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingUp, AlertTriangle, CheckCircle2, DollarSign } from 'lucide-react';
 
+interface DashboardData {
+  kpis: {
+    totalPorCobrar: number;
+    montoRecuperado: number;
+    carteraVencida: number;
+    tiempoPromedio: number;
+  };
+  alerts: {
+    overdue: Array<{
+      projectName: string;
+      milestoneName: string;
+      amount: string;
+      status: 'overdue';
+      daysOverdue: number;
+      clientName: string;
+    }>;
+    exigible: Array<{
+      projectName: string;
+      milestoneName: string;
+      amount: string;
+      status: 'exigible';
+      clientName: string;
+    }>;
+  };
+  reconciliations: Array<{
+    projectName: string;
+    milestoneName: string;
+    amount: string;
+    date: string;
+    reconciliedBy: string;
+    paymentMethod: string;
+  }>;
+  summaryStats: {
+    activeProjects: number;
+    hitosPorCobrar: number;
+    tasaEfectividad: number;
+    carteraSana: number;
+  };
+  analystEffectiveness: Array<{
+    name: string;
+    efectividad: number;
+    cobrado: number;
+    exigible: number;
+  }>;
+}
+
 export default function DashboardPage() {
+  const [data, setData] = useState<DashboardData | null>(null);
+
+  useEffect(() => {
+    fetch('/api/dashboard')
+      .then(res => res.json())
+      .then(setData);
+  }, []);
+
+  if (!data) {
+    return (
+      <AppLayout>
+        <div className="p-6 lg:p-8 space-y-8">
+          <Skeleton className="h-10 w-64" />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1,2,3,4].map(i => <Skeleton key={i} className="h-32" />)}
+          </div>
+          <Skeleton className="h-64" />
+        </div>
+      </AppLayout>
+    );
+  }
+
+  const { kpis, alerts, reconciliations, summaryStats, analystEffectiveness } = data;
+
   return (
     <AppLayout>
       <div className="p-6 lg:p-8 space-y-8">
-        {/* Header */}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
               Dashboard Ejecutivo
             </h1>
             <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Estado de cobranzas por hitos - Mayo 2024
+              Estado de cobranzas por hitos
             </p>
           </div>
           <Button variant="outline">Generar Reporte</Button>
         </div>
 
-        {/* KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <KPICard
             label="Monto Total por Cobrar"
-            value="$2,450,000"
+            value={`$${kpis.totalPorCobrar.toLocaleString()}`}
             trend={5}
             trendLabel="vs. mes anterior"
             icon={<DollarSign className="h-8 w-8" />}
@@ -38,15 +108,15 @@ export default function DashboardPage() {
           />
           <KPICard
             label="Monto Recuperado (Este Mes)"
-            value="$1,180,500"
+            value={`$${kpis.montoRecuperado.toLocaleString()}`}
             trend={12}
-            trendLabel="48% de avance"
+            trendLabel="avance"
             icon={<TrendingUp className="h-8 w-8" />}
             variant="success"
           />
           <KPICard
             label="Cartera Vencida"
-            value="$385,200"
+            value={`$${kpis.carteraVencida.toLocaleString()}`}
             trend={-8}
             trendLabel="reducción vs. mes anterior"
             icon={<AlertTriangle className="h-8 w-8" />}
@@ -54,7 +124,7 @@ export default function DashboardPage() {
           />
           <KPICard
             label="Tiempo Promedio de Recuperación"
-            value="18 días"
+            value={`${kpis.tiempoPromedio} días`}
             trend={2}
             trendLabel="mejora en ciclo"
             icon={<CheckCircle2 className="h-8 w-8" />}
@@ -62,12 +132,9 @@ export default function DashboardPage() {
           />
         </div>
 
-        {/* Effectiveness Chart */}
-        <EffectivenessChart />
+        <EffectivenessChart data={analystEffectiveness} />
 
-        {/* Two Column Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Alerts Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -78,63 +145,34 @@ export default function DashboardPage() {
                   Hitos exigibles y en mora
                 </p>
               </div>
-              <Button variant="link" className="text-primary">
-                Ver todos
-              </Button>
+              <Button variant="link" className="text-primary">Ver todos</Button>
             </div>
 
             <div className="space-y-3">
-              {/* Overdue Items */}
-              <div className="mb-4">
-                <h3 className="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wide mb-3">
-                  EN MORA
-                </h3>
-                <div className="space-y-3">
-                  <AlertItem
-                    projectName="Proyecto SAP Implementation"
-                    milestoneName="Fase 2: Configuración de Módulos"
-                    amount="125,000"
-                    status="overdue"
-                    daysOverdue={14}
-                    clientName="Grupo Industrial XYZ"
-                  />
-                  <AlertItem
-                    projectName="Transformación Digital Retail"
-                    milestoneName="Hito 3: Integración de Sistemas"
-                    amount="85,000"
-                    status="overdue"
-                    daysOverdue={7}
-                    clientName="Cadena Retail ABC"
-                  />
+              {alerts.overdue.length > 0 && (
+                <div className="mb-4">
+                  <h3 className="text-xs font-semibold text-red-600 dark:text-red-400 uppercase tracking-wide mb-3">
+                    EN MORA
+                  </h3>
+                  <div className="space-y-3">
+                    {alerts.overdue.map((a, i) => <AlertItem key={i} {...a} />)}
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Exigible Items */}
-              <div>
-                <h3 className="text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide mb-3">
-                  EXIGIBLES
-                </h3>
-                <div className="space-y-3">
-                  <AlertItem
-                    projectName="Consultoría Estratégica FMCG"
-                    milestoneName="Entrega Final: Plan de Acción"
-                    amount="95,000"
-                    status="exigible"
-                    clientName="Compañía de Consumo Masivo"
-                  />
-                  <AlertItem
-                    projectName="Auditoría Financiera Integral"
-                    milestoneName="Hito 2: Auditoría de Procesos"
-                    amount="110,500"
-                    status="exigible"
-                    clientName="Banco Regional Sur"
-                  />
+              {alerts.exigible.length > 0 && (
+                <div>
+                  <h3 className="text-xs font-semibold text-orange-600 dark:text-orange-400 uppercase tracking-wide mb-3">
+                    EXIGIBLES
+                  </h3>
+                  <div className="space-y-3">
+                    {alerts.exigible.map((a, i) => <AlertItem key={i} {...a} />)}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
 
-          {/* Reconciliation Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
@@ -145,82 +183,32 @@ export default function DashboardPage() {
                   Pagos validados por contabilidad
                 </p>
               </div>
-              <Button variant="link" className="text-primary">
-                Ver historial
-              </Button>
+              <Button variant="link" className="text-primary">Ver historial</Button>
             </div>
 
             <div className="space-y-3">
-              <ReconciliationItem
-                projectName="Sistema CRM Enterprise"
-                milestoneName="Implementación Fase 1"
-                amount="150,000"
-                date="4 de mayo"
-                reconciliedBy="Contabilidad"
-                paymentMethod="Transferencia"
-              />
-              <ReconciliationItem
-                projectName="Renovación Identidad Corporativa"
-                milestoneName="Diseño Ejecutivo"
-                amount="65,000"
-                date="2 de mayo"
-                reconciliedBy="Contabilidad"
-                paymentMethod="Tarjeta de Crédito"
-              />
-              <ReconciliationItem
-                projectName="Optimización de Procesos Manufactura"
-                milestoneName="Diagnóstico Inicial"
-                amount="85,000"
-                date="30 de abril"
-                reconciliedBy="Contabilidad"
-                paymentMethod="Transferencia"
-              />
-              <ReconciliationItem
-                projectName="Consultoría en Gestión Talento"
-                milestoneName="Fase 1: Evaluación de Competencias"
-                amount="55,000"
-                date="28 de abril"
-                reconciliedBy="Contabilidad"
-                paymentMethod="Cheque"
-              />
-              <ReconciliationItem
-                projectName="Desarrollo Portal Web B2B"
-                milestoneName="Backend y APIs"
-                amount="120,000"
-                date="25 de abril"
-                reconciliedBy="Contabilidad"
-                paymentMethod="Transferencia"
-              />
+              {reconciliations.map((r, i) => <ReconciliationItem key={i} {...r} />)}
             </div>
           </div>
         </div>
 
-        {/* Summary Stats */}
         <Card className="p-6 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200 dark:border-blue-800">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold">
-                Proyectos Activos
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">12</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold">Proyectos Activos</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{summaryStats.activeProjects}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold">
-                Hitos por Cobrar
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">28</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold">Hitos por Cobrar</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{summaryStats.hitosPorCobrar}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold">
-                Tasa de Efectividad
-              </p>
-              <p className="text-2xl font-bold text-green-600 dark:text-green-500 mt-2">88%</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold">Tasa de Efectividad</p>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-500 mt-2">{summaryStats.tasaEfectividad}%</p>
             </div>
             <div>
-              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold">
-                Cartera Sana
-              </p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">68%</p>
+              <p className="text-xs text-gray-600 dark:text-gray-400 uppercase font-semibold">Cartera Sana</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{summaryStats.carteraSana}%</p>
             </div>
           </div>
         </Card>

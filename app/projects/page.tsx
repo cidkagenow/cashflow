@@ -1,41 +1,33 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { FolderPlus, DollarSign, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
-// Mock projects data
-const projects = [
-  {
-    id: '1',
-    clientName: 'TechCorp Solutions',
-    projectName: 'Transformación Digital - Fase 1',
-    totalAmount: 450000,
-    paidAmount: 225000,
-    status: 'in-progress',
-  },
-  {
-    id: '2',
-    clientName: 'FinServ International',
-    projectName: 'Plataforma de Pagos - Integración',
-    totalAmount: 320000,
-    paidAmount: 80000,
-    status: 'in-progress',
-  },
-  {
-    id: '3',
-    clientName: 'RetailCorp',
-    projectName: 'Sistema de Inventario',
-    totalAmount: 280000,
-    paidAmount: 280000,
-    status: 'completed',
-  },
-];
+interface Project {
+  id: string;
+  clientName: string;
+  projectName: string;
+  totalAmount: number;
+  paidAmount: number;
+  status: string;
+}
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/projects')
+      .then(res => res.json())
+      .then(data => { setProjects(data); setLoading(false); });
+  }, []);
+
   const getStatusBadge = (status: string, paid: number, total: number) => {
     if (status === 'completed') {
       return <Badge className="bg-green-100 text-green-800">Completado</Badge>;
@@ -48,6 +40,17 @@ export default function ProjectsPage() {
     }
     return <Badge className="bg-blue-100 text-blue-800">Sin Pagar</Badge>;
   };
+
+  if (loading) {
+    return (
+      <AppLayout>
+        <div className="space-y-6">
+          <Skeleton className="h-10 w-48" />
+          {[1,2,3].map(i => <Skeleton key={i} className="h-40" />)}
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -74,9 +77,7 @@ export default function ProjectsPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="text-sm text-muted-foreground">{project.clientName}</p>
-                        <h3 className="text-lg font-semibold text-foreground">
-                          {project.projectName}
-                        </h3>
+                        <h3 className="text-lg font-semibold text-foreground">{project.projectName}</h3>
                       </div>
                       {getStatusBadge(project.status, project.paidAmount, project.totalAmount)}
                     </div>
@@ -84,30 +85,21 @@ export default function ProjectsPage() {
                     <div className="grid grid-cols-3 gap-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <DollarSign className="h-4 w-4" />
-                          Total
+                          <DollarSign className="h-4 w-4" /> Total
                         </div>
-                        <p className="font-semibold text-foreground">
-                          ${project.totalAmount.toLocaleString()}
-                        </p>
+                        <p className="font-semibold text-foreground">${project.totalAmount.toLocaleString()}</p>
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <CheckCircle2 className="h-4 w-4" />
-                          Pagado
+                          <CheckCircle2 className="h-4 w-4" /> Pagado
                         </div>
-                        <p className="font-semibold text-green-600">
-                          ${project.paidAmount.toLocaleString()}
-                        </p>
+                        <p className="font-semibold text-green-600">${project.paidAmount.toLocaleString()}</p>
                       </div>
                       <div className="space-y-1">
                         <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                          <AlertCircle className="h-4 w-4" />
-                          Por Cobrar
+                          <AlertCircle className="h-4 w-4" /> Por Cobrar
                         </div>
-                        <p className="font-semibold text-orange-600">
-                          ${owedAmount.toLocaleString()}
-                        </p>
+                        <p className="font-semibold text-orange-600">${owedAmount.toLocaleString()}</p>
                       </div>
                     </div>
 
