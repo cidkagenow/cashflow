@@ -20,27 +20,27 @@ interface ActivityItemProps {
 const actionConfig = {
   call: {
     icon: Phone,
-    color: 'bg-blue-100 text-blue-700',
+    color: 'bg-blue-500/15 text-blue-400',
     label: 'Llamada',
   },
   message: {
     icon: MessageSquare,
-    color: 'bg-purple-100 text-purple-700',
+    color: 'bg-purple-500/15 text-purple-400',
     label: 'WhatsApp',
   },
   payment: {
     icon: CheckCircle2,
-    color: 'bg-green-100 text-green-700',
+    color: 'bg-emerald-500/15 text-emerald-400',
     label: 'Pago Registrado',
   },
   reconciliation: {
     icon: FileText,
-    color: 'bg-orange-100 text-orange-700',
+    color: 'bg-orange-500/15 text-orange-400',
     label: 'Conciliación',
   },
   note: {
     icon: AlertCircle,
-    color: 'bg-slate-100 text-slate-700',
+    color: 'bg-slate-500/15 text-slate-400',
     label: 'Nota',
   },
 };

@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client'
+import bcrypt from 'bcryptjs'
 
 const prisma = new PrismaClient()
 
 async function main() {
   // Clean all tables
+  await prisma.user.deleteMany()
   await prisma.auditLog.deleteMany()
   await prisma.automationRule.deleteMany()
   await prisma.automationTemplate.deleteMany()
@@ -15,6 +17,24 @@ async function main() {
   await prisma.project.deleteMany()
   await prisma.analyst.deleteMany()
   await prisma.client.deleteMany()
+
+  // ─── Users ────────────────────────────────────────────────────────
+  await prisma.user.create({
+    data: {
+      email: 'admin@payflow.com',
+      password: bcrypt.hashSync('admin123', 10),
+      name: 'Admin PayFlow',
+      role: 'admin',
+    },
+  })
+  await prisma.user.create({
+    data: {
+      email: 'maria@iassat.com',
+      password: bcrypt.hashSync('maria123', 10),
+      name: 'María López',
+      role: 'analyst',
+    },
+  })
 
   // ─── Analysts ─────────────────────────────────────────────────────
   const maria = await prisma.analyst.create({ data: { id: 'analyst-1', name: 'María López', initials: 'ML', email: 'maria@iassat.com' } })

@@ -7,6 +7,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ─── User ───────────────────────────────────────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("analyst")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 // ─── Project ────────────────────────────────────────────────────────
 // States: Borrador, PendienteAdelanto, EnCurso, Pausado, Finalizado, Cancelado
 model Project {

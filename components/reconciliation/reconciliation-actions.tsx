@@ -30,8 +30,6 @@ export function ReconciliationActions({
   const [observeReason, setObserveReason] = useState('');
   const [rejectReason, setRejectReason] = useState('');
 
-  const hasDiscrepancy = payment ? Math.abs(payment.expectedAmount - payment.receivedAmount) > 0.01 : false;
-
   const handleObserve = () => {
     if (observeReason.trim()) {
       onObserve(observeReason);
@@ -50,12 +48,11 @@ export function ReconciliationActions({
 
   return (
     <div className="space-y-4">
-      {/* Main action buttons */}
       <Card className="p-4 space-y-3">
         <Button
           onClick={onConfirm}
           disabled={!payment || isLoading}
-          className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
+          className="w-full gap-2 bg-emerald-600 hover:bg-emerald-700 text-white"
           size="lg"
         >
           <CheckCircle2 className="h-5 w-5" />
@@ -66,7 +63,7 @@ export function ReconciliationActions({
           onClick={() => setObserveOpen(true)}
           disabled={!payment || isLoading}
           variant="outline"
-          className="w-full gap-2 border-yellow-200 text-yellow-800 hover:bg-yellow-50"
+          className="w-full gap-2 border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10"
           size="lg"
         >
           <AlertCircle className="h-5 w-5" />
@@ -77,7 +74,7 @@ export function ReconciliationActions({
           onClick={() => setRejectOpen(true)}
           disabled={!payment || isLoading}
           variant="outline"
-          className="w-full gap-2 border-red-200 text-red-800 hover:bg-red-50"
+          className="w-full gap-2 border-red-500/30 text-red-400 hover:bg-red-500/10"
           size="lg"
         >
           <XCircle className="h-5 w-5" />
@@ -85,44 +82,27 @@ export function ReconciliationActions({
         </Button>
       </Card>
 
-      {/* Next button */}
       {hasNext && (
-        <Button
-          onClick={onNext}
-          disabled={!payment || isLoading}
-          variant="outline"
-          className="w-full"
-        >
+        <Button onClick={onNext} disabled={!payment || isLoading} variant="outline" className="w-full">
           Siguiente pago →
         </Button>
       )}
 
-      {/* Observe modal */}
       {observeOpen && (
-        <Card className="p-4 border-yellow-200 bg-yellow-50">
+        <Card className="p-4 border-yellow-500/30 bg-yellow-500/5">
           <div className="space-y-3">
             <h4 className="font-semibold text-foreground">Motivo de la observación</h4>
             <textarea
               value={observeReason}
               onChange={(e) => setObserveReason(e.target.value)}
-              placeholder="Describe el motivo de la observación (ej: Monto inferior al esperado, Documento incompleto...)"
+              placeholder="Describe el motivo de la observación..."
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-24"
             />
             <div className="flex gap-2 justify-end">
-              <Button
-                onClick={() => {
-                  setObserveOpen(false);
-                  setObserveReason('');
-                }}
-                variant="outline"
-              >
+              <Button onClick={() => { setObserveOpen(false); setObserveReason(''); }} variant="outline">
                 Cancelar
               </Button>
-              <Button
-                onClick={handleObserve}
-                disabled={!observeReason.trim() || isLoading}
-                className="bg-yellow-600 hover:bg-yellow-700 text-white"
-              >
+              <Button onClick={handleObserve} disabled={!observeReason.trim() || isLoading} className="bg-yellow-600 hover:bg-yellow-700 text-white">
                 Guardar observación
               </Button>
             </div>
@@ -130,32 +110,21 @@ export function ReconciliationActions({
         </Card>
       )}
 
-      {/* Reject modal */}
       {rejectOpen && (
-        <Card className="p-4 border-red-200 bg-red-50">
+        <Card className="p-4 border-red-500/30 bg-red-500/5">
           <div className="space-y-3">
             <h4 className="font-semibold text-foreground">Motivo del rechazo</h4>
             <textarea
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="Describe el motivo del rechazo (ej: Monto insuficiente, Documento fraudulento...)"
+              placeholder="Describe el motivo del rechazo..."
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-24"
             />
             <div className="flex gap-2 justify-end">
-              <Button
-                onClick={() => {
-                  setRejectOpen(false);
-                  setRejectReason('');
-                }}
-                variant="outline"
-              >
+              <Button onClick={() => { setRejectOpen(false); setRejectReason(''); }} variant="outline">
                 Cancelar
               </Button>
-              <Button
-                onClick={handleReject}
-                disabled={!rejectReason.trim() || isLoading}
-                className="bg-red-600 hover:bg-red-700 text-white"
-              >
+              <Button onClick={handleReject} disabled={!rejectReason.trim() || isLoading} className="bg-red-600 hover:bg-red-700 text-white">
                 Rechazar pago
               </Button>
             </div>

@@ -5,6 +5,7 @@ import { AppLayout } from '@/components/app-layout'
 import { FilterBar } from '@/components/milestones/filter-bar'
 import { PortfolioGrid } from '@/components/milestones/portfolio-grid'
 import { Skeleton } from '@/components/ui/skeleton'
+import { animateEntrance } from '@/lib/anime-utils'
 
 interface Milestone {
   id: string;
@@ -28,12 +29,22 @@ export default function MilestonesPage() {
   const [selectedAnalyst, setSelectedAnalyst] = useState('todos')
   const [selectedPriority, setSelectedPriority] = useState('todos')
   const [searchQuery, setSearchQuery] = useState('')
+  const [animated, setAnimated] = useState(false)
 
   useEffect(() => {
     fetch('/api/milestones')
       .then(res => res.json())
       .then(data => { setMilestones(data); setLoading(false); })
   }, [])
+
+  useEffect(() => {
+    if (loading || animated) return
+    setAnimated(true)
+    
+      animateEntrance({ title: '.ms-title', subtitle: '.ms-subtitle', sections: '.ms-section' })
+
+
+  }, [loading, animated])
 
   const filteredMilestones = useMemo(() => {
     return milestones.filter((milestone) => {
@@ -84,7 +95,7 @@ export default function MilestonesPage() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="space-y-6">
+        <div className="p-6 lg:p-8 space-y-6">
           <Skeleton className="h-10 w-64" />
           <Skeleton className="h-16" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -97,13 +108,13 @@ export default function MilestonesPage() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
+      <div className="p-6 lg:p-8 space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Panel de Cartera</h1>
-          <p className="text-muted-foreground">Gestiona los hitos que requieren acción inmediata</p>
+          <h1 className="ms-title text-2xl font-bold text-foreground tracking-tight">Panel de Cartera</h1>
+          <p className="ms-subtitle text-muted-foreground">Gestiona los hitos que requieren acción inmediata</p>
         </div>
 
-        <FilterBar
+        <div className="ms-section"><FilterBar
           selectedStatus={selectedStatus}
           onStatusChange={setSelectedStatus}
           selectedAnalyst={selectedAnalyst}
@@ -112,7 +123,7 @@ export default function MilestonesPage() {
           onPriorityChange={setSelectedPriority}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-        />
+        /></div>
 
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="text-sm">

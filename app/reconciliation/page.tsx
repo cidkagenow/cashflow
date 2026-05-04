@@ -9,6 +9,7 @@ import { ReconciliationActions } from '@/components/reconciliation/reconciliatio
 import { ReconciliationHeader } from '@/components/reconciliation/reconciliation-header';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { animateEntrance } from '@/lib/anime-utils';
 
 export default function ReconciliationPage() {
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
@@ -17,12 +18,19 @@ export default function ReconciliationPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [methodFilter, setMethodFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [animated, setAnimated] = useState(false);
 
   useEffect(() => {
     fetch('/api/reconciliation')
       .then(res => res.json())
       .then(data => { setPayments(data); setLoading(false); });
   }, []);
+
+  useEffect(() => {
+    if (loading || animated) return;
+    setAnimated(true);
+    animateEntrance({ title: '.recon-header', sections: '.recon-section' });
+  }, [loading, animated]);
 
   const filteredPayments = useMemo(() => {
     return payments
@@ -78,7 +86,7 @@ export default function ReconciliationPage() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="space-y-6">
+        <div className="p-6 lg:p-8 space-y-6">
           <Skeleton className="h-20" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-3">{[1,2,3].map(i => <Skeleton key={i} className="h-24" />)}</div>
@@ -91,10 +99,12 @@ export default function ReconciliationPage() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <ReconciliationHeader payments={payments} filteredCount={filteredPayments.length} />
+      <div className="p-6 lg:p-8 space-y-6">
+        <div className="recon-header">
+          <ReconciliationHeader payments={payments} filteredCount={filteredPayments.length} />
+        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="recon-section grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-4">
             <PaymentListFilter
               statusFilter={statusFilter}

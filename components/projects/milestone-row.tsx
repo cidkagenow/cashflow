@@ -37,14 +37,14 @@ const getComputedStatus = (activationType: string) => {
   if (activationType === 'firma') {
     return {
       label: 'Exigible',
-      bgColor: 'bg-orange-100',
-      textColor: 'text-orange-800',
+      bgColor: 'bg-orange-500/15',
+      textColor: 'text-orange-400',
     }
   }
   return {
     label: 'Bloqueado',
-    bgColor: 'bg-gray-100',
-    textColor: 'text-gray-800',
+    bgColor: 'bg-slate-500/15',
+    textColor: 'text-slate-400',
   }
 }
 

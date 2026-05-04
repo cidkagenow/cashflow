@@ -8,6 +8,7 @@ import { TemplateEditor, Template } from '@/components/automation/template-edito
 import { MessagePreview } from '@/components/automation/message-preview';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { animateEntrance, animateHoverButtons } from '@/lib/anime-utils';
 
 export default function AutomationPage() {
   const [templates, setTemplates] = useState<Template[]>([]);
@@ -32,6 +33,12 @@ export default function AutomationPage() {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    if (loading) return;
+    animateEntrance({ title: '.auto-title', subtitle: '.auto-subtitle', sections: '.auto-section' });
+    animateHoverButtons();
+  }, [loading]);
 
   const handleRuleCreate = async (rule: Omit<AutomationRule, 'id' | 'active'>) => {
     const res = await fetch('/api/automation/rules', {
@@ -76,7 +83,7 @@ export default function AutomationPage() {
   if (loading) {
     return (
       <AppLayout>
-        <div className="space-y-6">
+        <div className="p-6 lg:p-8 space-y-6">
           <Skeleton className="h-10 w-48" />
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="space-y-4">{[1,2,3].map(i => <Skeleton key={i} className="h-24" />)}</div>
@@ -89,22 +96,22 @@ export default function AutomationPage() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
+      <div className="p-6 lg:p-8 space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Automatización</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="auto-title text-3xl font-bold text-foreground">Automatización</h1>
+          <p className="auto-subtitle text-muted-foreground mt-1">
             Configura reglas de cobranza y plantillas de mensajes automáticos
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6">
-          <div className="space-y-4">
+          <div className="auto-section space-y-4">
             <h2 className="text-xl font-semibold">Reglas de Cobranza</h2>
             <RuleBuilder templates={templates} onRuleCreate={handleRuleCreate} />
             <RuleList rules={rules} onToggleRule={handleToggleRule} onDeleteRule={handleDeleteRule} />
           </div>
 
-          <div className="space-y-4">
+          <div className="auto-section space-y-4">
             <h2 className="text-xl font-semibold">Plantillas de Mensajes</h2>
             <TemplateEditor
               templates={templates}

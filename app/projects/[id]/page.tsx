@@ -7,6 +7,7 @@ import { CaseHeader } from '@/components/cases/case-header';
 import { CaseSidebar } from '@/components/cases/case-sidebar';
 import { ActivityFeed } from '@/components/cases/activity-feed';
 import { Skeleton } from '@/components/ui/skeleton';
+import { animateEntrance } from '@/lib/anime-utils';
 
 interface ProjectDetail {
   id: string;
@@ -66,10 +67,15 @@ export default function CaseDetailPage() {
       .catch(() => { setError(true); setLoading(false); });
   }, [projectId]);
 
+  useEffect(() => {
+    if (loading || !project) return;
+    animateEntrance({ title: '.case-header', sections: '.case-section' });
+  }, [loading, project]);
+
   if (loading) {
     return (
       <AppLayout>
-        <div className="space-y-6 p-6">
+        <div className="p-6 lg:p-8 space-y-6">
           <Skeleton className="h-32" />
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <Skeleton className="h-96" />
@@ -92,24 +98,26 @@ export default function CaseDetailPage() {
 
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <CaseHeader
-          clientName={project.clientName}
-          projectName={project.projectName}
-          totalAmount={project.totalAmount}
-          paidAmount={project.paidAmount}
-          currency={project.currency}
-        />
+      <div className="p-6 lg:p-8 space-y-6">
+        <div className="case-header">
+          <CaseHeader
+            clientName={project.clientName}
+            projectName={project.projectName}
+            totalAmount={project.totalAmount}
+            paidAmount={project.paidAmount}
+            currency={project.currency}
+          />
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-1">
+          <div className="case-section lg:col-span-1">
             <CaseSidebar
               milestones={project.milestones}
               documents={project.documents}
               payments={project.payments}
             />
           </div>
-          <div className="lg:col-span-2">
+          <div className="case-section lg:col-span-2">
             <ActivityFeed initialActivities={project.activities} />
           </div>
         </div>

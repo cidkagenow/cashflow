@@ -50,7 +50,7 @@ test.describe('API Routes', () => {
   })
 
   test('PATCH /api/milestones/:id allows valid transitions', async ({ request }) => {
-    const res = await request.patch('/api/milestones/ms-35', {
+    const res = await request.patch('/api/milestones/ms-39', {
       data: { financialStatus: 'Notificado', userName: 'Test User', reason: 'E2E test' },
     })
     expect(res.status()).toBe(200)

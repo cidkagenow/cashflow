@@ -31,7 +31,7 @@ export function RuleItem({ rule, onToggle, onDelete }: RuleItemProps) {
           </div>
 
           <div className="flex items-center gap-3 text-sm text-muted-foreground">
-            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-medium">
+            <span className="px-2 py-1 bg-blue-500/15 text-blue-400 rounded text-xs font-medium">
               {rule.templateName}
             </span>
             

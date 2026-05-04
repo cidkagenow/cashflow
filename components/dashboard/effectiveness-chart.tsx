@@ -24,9 +24,9 @@ export function EffectivenessChart({ data }: { data?: AnalystData[] }) {
   const worst = data.reduce((a, b) => a.efectividad < b.efectividad ? a : b);
 
   return (
-    <Card className="p-6 bg-white dark:bg-slate-900">
+    <Card className="p-6 bg-card">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Efectividad por Analista</h3>
+        <h3 className="text-lg font-semibold text-foreground">Efectividad por Analista</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Tasa de recuperación de cada miembro del equipo</p>
       </div>
       <ResponsiveContainer width="100%" height={300}>
@@ -59,7 +59,7 @@ export function EffectivenessChart({ data }: { data?: AnalystData[] }) {
       <div className="mt-6 grid grid-cols-3 gap-4">
         <div className="text-center">
           <p className="text-xs text-gray-600 dark:text-gray-400">Efectividad Promedio</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{avg}%</p>
+          <p className="text-2xl font-bold text-foreground">{avg}%</p>
         </div>
         <div className="text-center">
           <p className="text-xs text-gray-600 dark:text-gray-400">Mejor Desempeño</p>
