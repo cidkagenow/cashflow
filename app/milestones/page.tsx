@@ -15,6 +15,7 @@ interface Milestone {
   daysActive: number;
   daysOverdue: number;
   status: string;
+  financialStatus?: string;
   lastAction: string;
   lastActionDate: string;
   responsible: string;
@@ -36,7 +37,7 @@ export default function MilestonesPage() {
 
   const filteredMilestones = useMemo(() => {
     return milestones.filter((milestone) => {
-      if (selectedStatus !== 'todos' && milestone.status !== selectedStatus) return false
+      if (selectedStatus !== 'todos' && milestone.status !== selectedStatus && milestone.financialStatus !== selectedStatus) return false
 
       if (selectedAnalyst !== 'todos') {
         const analystMap: Record<string, string> = {
@@ -120,11 +121,11 @@ export default function MilestonesPage() {
           </div>
           <div className="flex gap-4 text-sm">
             <div>
-              <span className="font-semibold text-red-600">{sortedMilestones.filter(m => m.status === 'en_mora').length}</span>
+              <span className="font-semibold text-red-600">{sortedMilestones.filter(m => m.status === 'EnMora').length}</span>
               <span className="text-muted-foreground"> en mora</span>
             </div>
             <div>
-              <span className="font-semibold text-orange-600">{sortedMilestones.filter(m => m.status === 'exigible').length}</span>
+              <span className="font-semibold text-orange-600">{sortedMilestones.filter(m => m.status === 'Exigible').length}</span>
               <span className="text-muted-foreground"> exigibles</span>
             </div>
           </div>
@@ -139,13 +140,13 @@ export default function MilestonesPage() {
 function getPriorityLevel(milestone: Milestone): string {
   if (milestone.daysOverdue && milestone.daysOverdue > 0) return 'critica'
   if (milestone.daysActive > 30) return 'alta'
-  if (milestone.status === 'exigible') return 'media'
+  if (milestone.status === 'Exigible') return 'media'
   return 'baja'
 }
 
 function getPriorityWeight(milestone: Milestone): number {
   if (milestone.daysOverdue && milestone.daysOverdue > 0) return 4
   if (milestone.daysActive > 30) return 3
-  if (milestone.status === 'exigible') return 2
+  if (milestone.status === 'Exigible') return 2
   return 1
 }

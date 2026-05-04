@@ -7,7 +7,7 @@ export async function GET(request: Request) {
   const analyst = searchParams.get('analyst')
 
   const where: Record<string, unknown> = {}
-  if (status && status !== 'todos') where.status = status
+  if (status && status !== 'todos') where.financialStatus = status
   if (analyst && analyst !== 'todos') where.analystId = analyst
 
   const milestones = await prisma.milestone.findMany({
@@ -15,6 +15,7 @@ export async function GET(request: Request) {
     include: {
       project: { include: { client: true } },
       analyst: true,
+      deliverable: true,
     },
     orderBy: { daysOverdue: 'desc' },
   })
@@ -23,13 +24,23 @@ export async function GET(request: Request) {
     id: m.id,
     clientName: m.project.client.name,
     projectName: m.project.name,
+    projectId: m.projectId,
     milestoneName: m.name,
     amount: m.amount,
+    paidAmount: m.paidAmount,
+    pendingAmount: m.pendingAmount,
     daysActive: m.daysActive,
     daysOverdue: m.daysOverdue,
-    status: m.status,
+    financialStatus: m.financialStatus,
+    status: m.financialStatus,
+    activationType: m.activationType,
+    dueDate: m.dueDate?.toISOString() ?? null,
     lastAction: m.lastAction ?? '',
-    lastActionDate: m.lastActionDate ?? '',
+    lastActionDate: m.lastActionDate?.toISOString() ?? '',
     responsible: m.analyst?.name ?? 'Sin asignar',
+    deliverable: m.deliverable ? { name: m.deliverable.name, technicalStatus: m.deliverable.technicalStatus } : null,
+    suspensionReason: m.suspensionReason,
+    commitmentDate: m.commitmentDate?.toISOString() ?? null,
+    commitmentAmount: m.commitmentAmount,
   })))
 }
