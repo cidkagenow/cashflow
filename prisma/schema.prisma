@@ -1,0 +1,208 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ─── User ───────────────────────────────────────────────────────────
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("analyst")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── Project ────────────────────────────────────────────────────────
+// States: Borrador, PendienteAdelanto, EnCurso, Pausado, Finalizado, Cancelado
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  service     String?
+  totalAmount Float
+  paidAmount  Float    @default(0)
+  currency    String   @default("USD")
+  status      String   @default("Borrador")
+  clientId    String
+  client      Client   @relation(fields: [clientId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  milestones   Milestone[]
+  deliverables Deliverable[]
+  documents    Document[]
+  payments     Payment[]
+  activities   Activity[]
+  auditLogs    AuditLog[]
+}
+
+// ─── Client ─────────────────────────────────────────────────────────
+model Client {
+  id        String    @id @default(cuid())
+  name      String
+  contact   String?
+  email     String?
+  phone     String?
+  createdAt DateTime  @default(now())
+  projects  Project[]
+}
+
+// ─── Analyst ────────────────────────────────────────────────────────
+model Analyst {
+  id           String        @id @default(cuid())
+  name         String
+  initials     String
+  email        String?
+  milestones   Milestone[]
+  deliverables Deliverable[]
+}
+
+// ─── Deliverable (Entregable Técnico) ───────────────────────────────
+// Technical states: Pendiente, EnCurso, Terminado, Observado, Subsanacion, Aprobado
+model Deliverable {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  technicalStatus String   @default("Pendiente")
+  evidence        String?
+  observationNote String?
+  responsibleId   String?
+  responsible     Analyst? @relation(fields: [responsibleId], references: [id])
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id])
+  milestones      Milestone[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+// ─── Milestone (Hito de Cobro) ──────────────────────────────────────
+// Financial states: Configurado, Bloqueado, Exigible, Notificado, EnMora,
+//   CompromisoPago, PagadoParcial, PagoEnRevision, PagoObservado,
+//   Pagado, Conciliado, Suspendido
+// Activation types: adelanto, firma, entregable, fecha, aprobacion_cliente,
+//   aprobacion_entidad, manual
+model Milestone {
+  id               String   @id @default(cuid())
+  name             String
+  amount           Float
+  financialStatus  String   @default("Configurado")
+  activationType   String   @default("manual")
+  dueDate          DateTime?
+  activatedAt      DateTime?
+  daysActive       Int      @default(0)
+  daysOverdue      Int      @default(0)
+  paidAmount       Float    @default(0)
+  pendingAmount    Float    @default(0)
+  lastAction       String?
+  lastActionDate   DateTime?
+
+  // Suspension fields
+  suspensionReason String?
+  suspensionDate   DateTime?
+  suspendedBy      String?
+
+  // Commitment fields
+  commitmentDate   DateTime?
+  commitmentAmount Float?
+
+  // Relations
+  projectId      String
+  project        Project      @relation(fields: [projectId], references: [id])
+  analystId      String?
+  analyst        Analyst?     @relation(fields: [analystId], references: [id])
+  deliverableId  String?
+  deliverable    Deliverable? @relation(fields: [deliverableId], references: [id])
+  payments       Payment[]
+  auditLogs      AuditLog[]
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+// ─── Payment ────────────────────────────────────────────────────────
+model Payment {
+  id             String    @id @default(cuid())
+  amount         Float
+  expectedAmount Float?
+  method         String
+  reference      String?
+  voucherImage   String?
+  status         String    @default("pending")
+  reconciledBy   String?
+  reconciledAt   DateTime?
+  observedReason String?
+  isPartial      Boolean   @default(false)
+  date           DateTime  @default(now())
+  projectId      String
+  project        Project   @relation(fields: [projectId], references: [id])
+  milestoneId    String?
+  milestone      Milestone? @relation(fields: [milestoneId], references: [id])
+  createdAt      DateTime  @default(now())
+}
+
+// ─── Document ───────────────────────────────────────────────────────
+model Document {
+  id        String  @id @default(cuid())
+  name      String
+  type      String
+  url       String?
+  date      String
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+}
+
+// ─── Activity (timeline display) ────────────────────────────────────
+model Activity {
+  id           String  @id @default(cuid())
+  userName     String
+  userInitials String
+  action       String
+  actionLabel  String
+  comment      String?
+  tags         String?
+  timestamp    String
+  projectId    String
+  project      Project @relation(fields: [projectId], references: [id])
+}
+
+// ─── AuditLog (Bitácora - mandatory traceability) ───────────────────
+model AuditLog {
+  id            String   @id @default(cuid())
+  entityType    String
+  entityId      String
+  action        String
+  previousState String?
+  newState      String?
+  reason        String?
+  userName      String
+  userRole      String?
+  metadata      String?
+  projectId     String?
+  project       Project?  @relation(fields: [projectId], references: [id])
+  milestoneId   String?
+  milestone     Milestone? @relation(fields: [milestoneId], references: [id])
+  createdAt     DateTime @default(now())
+}
+
+// ─── Automation ─────────────────────────────────────────────────────
+model AutomationTemplate {
+  id      String           @id @default(cuid())
+  name    String
+  content String
+  channel String
+  rules   AutomationRule[]
+}
+
+model AutomationRule {
+  id         String             @id @default(cuid())
+  status     String
+  days       Int
+  channel    String
+  active     Boolean            @default(true)
+  templateId String
+  template   AutomationTemplate @relation(fields: [templateId], references: [id])
+}

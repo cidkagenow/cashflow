@@ -71,7 +71,6 @@ export function PaymentModal({
 
     setVoucher(file);
 
-    // Create preview for images
     if (file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -117,7 +116,6 @@ export function PaymentModal({
       isPartial: isPartialPayment,
     });
 
-    // Reset form
     setAmount('');
     setDepositDate('');
     setMethod('Transferencia');
@@ -138,161 +136,89 @@ export function PaymentModal({
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Expected Amount Info */}
           <div className="p-3 bg-muted rounded-lg">
             <div className="flex justify-between items-center">
               <span className="text-sm text-muted-foreground">Monto Esperado:</span>
-              <span className="text-lg font-semibold">
-                ${expectedAmount.toLocaleString()}
-              </span>
+              <span className="text-lg font-semibold">${expectedAmount.toLocaleString()}</span>
             </div>
           </div>
 
-          {/* Amount Input */}
           <div className="space-y-2">
-            <Label htmlFor="amount" className="text-base font-semibold">
-              Monto Pagado
-            </Label>
-            <Input
-              id="amount"
-              type="number"
-              placeholder="0"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              step="1000"
-              min="0"
-              className="text-lg"
-            />
+            <Label htmlFor="amount" className="text-base font-semibold">Monto Pagado</Label>
+            <Input id="amount" type="number" placeholder="0" value={amount} onChange={(e) => setAmount(e.target.value)} step="1000" min="0" className="text-lg" />
           </div>
 
-          {/* Alerts */}
           {isPartialPayment && (
-            <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg flex gap-2">
-              <AlertCircle className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-orange-800">
+            <div className="p-3 bg-orange-500/10 border border-orange-500/20 rounded-lg flex gap-2">
+              <AlertCircle className="h-5 w-5 text-orange-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-orange-400">
                 <p className="font-semibold">Pago Parcial</p>
                 <p className="text-xs mt-1">
-                  Este pago se registrará como parcial. Saldo pendiente:{' '}
-                  <strong>${remainingAmount.toLocaleString()}</strong>
+                  Este pago se registrará como parcial. Saldo pendiente: <strong>${remainingAmount.toLocaleString()}</strong>
                 </p>
               </div>
             </div>
           )}
 
           {isExcessPayment && (
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg flex gap-2">
-              <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-              <div className="text-sm text-blue-800">
+            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg flex gap-2">
+              <AlertCircle className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-blue-400">
                 <p className="font-semibold">Pago Excede Monto</p>
                 <p className="text-xs mt-1">
-                  El monto ingresado es mayor al esperado en $
-                  {(amountNum - expectedAmount).toLocaleString()}
+                  El monto ingresado es mayor al esperado en ${(amountNum - expectedAmount).toLocaleString()}
                 </p>
               </div>
             </div>
           )}
 
-          {/* Deposit Date */}
           <div className="space-y-2">
-            <Label htmlFor="depositDate" className="text-base font-semibold">
-              Fecha del Depósito
-            </Label>
-            <Input
-              id="depositDate"
-              type="date"
-              value={depositDate}
-              onChange={(e) => setDepositDate(e.target.value)}
-            />
+            <Label htmlFor="depositDate" className="text-base font-semibold">Fecha del Depósito</Label>
+            <Input id="depositDate" type="date" value={depositDate} onChange={(e) => setDepositDate(e.target.value)} />
           </div>
 
-          {/* Payment Method */}
           <div className="space-y-2">
-            <Label htmlFor="method" className="text-base font-semibold">
-              Medio de Pago
-            </Label>
-            <select
-              id="method"
-              value={method}
-              onChange={(e) => setMethod(e.target.value)}
-              className="w-full px-3 py-2 border rounded-md text-sm bg-background"
-            >
+            <Label htmlFor="method" className="text-base font-semibold">Medio de Pago</Label>
+            <select id="method" value={method} onChange={(e) => setMethod(e.target.value)} className="w-full px-3 py-2 border border-input rounded-md text-sm bg-background text-foreground">
               {paymentMethods.map((m) => (
-                <option key={m} value={m}>
-                  {m}
-                </option>
+                <option key={m} value={m}>{m}</option>
               ))}
             </select>
           </div>
 
-          {/* Reference */}
           <div className="space-y-2">
-            <Label htmlFor="reference" className="text-base font-semibold">
-              Referencia / Comprobante (Opcional)
-            </Label>
-            <Input
-              id="reference"
-              type="text"
-              placeholder="Ej: TRF-2024-12345"
-              value={reference}
-              onChange={(e) => setReference(e.target.value)}
-            />
+            <Label htmlFor="reference" className="text-base font-semibold">Referencia / Comprobante (Opcional)</Label>
+            <Input id="reference" type="text" placeholder="Ej: TRF-2024-12345" value={reference} onChange={(e) => setReference(e.target.value)} />
           </div>
 
-          {/* Drag & Drop Area */}
           <div className="space-y-2">
-            <Label className="text-base font-semibold">
-              Voucher / Comprobante
-            </Label>
+            <Label className="text-base font-semibold">Voucher / Comprobante</Label>
             <div
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
               className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-                dragActive
-                  ? 'border-orange-500 bg-orange-50'
-                  : 'border-muted-foreground/30 hover:border-muted-foreground'
+                dragActive ? 'border-primary bg-primary/5' : 'border-muted-foreground/30 hover:border-muted-foreground'
               }`}
             >
-              <input
-                type="file"
-                id="voucher"
-                accept="image/png,image/jpeg,application/pdf"
-                onChange={handleFileInput}
-                className="hidden"
-              />
-              <label
-                htmlFor="voucher"
-                className="flex flex-col items-center justify-center gap-2"
-              >
+              <input type="file" id="voucher" accept="image/png,image/jpeg,application/pdf" onChange={handleFileInput} className="hidden" />
+              <label htmlFor="voucher" className="flex flex-col items-center justify-center gap-2">
                 <Upload className="h-6 w-6 text-muted-foreground" />
                 <div>
-                  <p className="font-medium text-sm">
-                    Arrastra tu archivo aquí o haz click
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    PNG, JPG, PDF - Máx 5MB
-                  </p>
+                  <p className="font-medium text-sm">Arrastra tu archivo aquí o haz click</p>
+                  <p className="text-xs text-muted-foreground">PNG, JPG, PDF - Máx 5MB</p>
                 </div>
               </label>
             </div>
 
-            {/* Voucher Preview */}
             {voucherPreview && (
               <div className="relative">
                 <div className="relative w-full h-48 bg-muted rounded-lg overflow-hidden">
-                  <Image
-                    src={voucherPreview}
-                    alt="Voucher preview"
-                    fill
-                    className="object-cover"
-                  />
+                  <Image src={voucherPreview} alt="Voucher preview" fill className="object-cover" />
                 </div>
                 <button
-                  onClick={() => {
-                    setVoucher(null);
-                    setVoucherPreview(null);
-                  }}
+                  onClick={() => { setVoucher(null); setVoucherPreview(null); }}
                   className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
                 >
                   <X className="h-4 w-4" />
@@ -301,17 +227,9 @@ export function PaymentModal({
             )}
 
             {voucher && !voucherPreview && (
-              <div className="p-3 bg-green-50 border border-green-200 rounded-lg flex justify-between items-center">
-                <p className="text-sm font-medium text-green-800">
-                  {voucher.name}
-                </p>
-                <button
-                  onClick={() => {
-                    setVoucher(null);
-                    setVoucherPreview(null);
-                  }}
-                  className="text-red-500 hover:text-red-700"
-                >
+              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex justify-between items-center">
+                <p className="text-sm font-medium text-emerald-400">{voucher.name}</p>
+                <button onClick={() => { setVoucher(null); setVoucherPreview(null); }} className="text-red-400 hover:text-red-300">
                   <X className="h-4 w-4" />
                 </button>
               </div>
@@ -320,12 +238,8 @@ export function PaymentModal({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Cancelar
-          </Button>
-          <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
-            Registrar Pago
-          </Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button onClick={handleSave} className="bg-emerald-600 hover:bg-emerald-700 text-white">Registrar Pago</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

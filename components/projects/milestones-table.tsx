@@ -18,7 +18,6 @@ export function MilestonesTable({
       name: '',
       amount: 0,
       activationType: 'firma',
-      initialState: 'configurado',
     }
     onChange([...milestones, newMilestone])
   }

@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Outfit } from 'next/font/google'
+import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/next'
+import { ThemeProvider } from '@/components/theme-provider'
+import { AuthProvider } from '@/components/auth-provider'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const outfit = Outfit({ subsets: ["latin"], weight: ["300", "400", "500", "600", "700", "800", "900"] });
 
 export const metadata: Metadata = {
   title: 'IASSAT PayFlow - Gestión de Cobranzas por Hitos',
@@ -35,9 +37,20 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className="bg-background">
-      <body className="font-sans antialiased">
-        {children}
+    <html lang="es" className="dark" suppressHydrationWarning>
+      <body className={`${outfit.className} antialiased bg-background`}>
+        <script dangerouslySetInnerHTML={{ __html: `
+          try{var t=localStorage.getItem('payflow-theme');if(t==='light'){document.documentElement.classList.remove('dark')}else{document.documentElement.classList.add('dark')}}catch(e){}
+        `}} />
+        <ThemeProvider attribute="class" defaultTheme="dark" storageKey="payflow-theme" enableSystem={false} disableTransitionOnChange>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </ThemeProvider>
+        <Script
+          src="https://cdn.jsdelivr.net/npm/animejs/dist/bundles/anime.umd.min.js"
+          strategy="afterInteractive"
+        />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>

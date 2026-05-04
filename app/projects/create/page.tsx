@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { ArrowLeft, Save } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -12,6 +13,7 @@ import { ValidationAlert } from '@/components/projects/validation-alert'
 import { MilestoneRowData } from '@/components/projects/milestone-row'
 
 export default function CreateProjectPage() {
+  const router = useRouter()
   const [projectData, setProjectData] = useState<ProjectData>({
     clientId: '',
     contactName: '',
@@ -46,16 +48,20 @@ export default function CreateProjectPage() {
     )
   }, [projectData, milestones, isValid])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!canSubmit) return
 
-    console.log('[v0] Project data:', {
-      ...projectData,
-      milestones,
+    const res = await fetch('/api/projects', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...projectData, milestones }),
     })
 
-    alert('Proyecto creado exitosamente! (Mock submission)')
+    if (res.ok) {
+      const project = await res.json()
+      router.push(`/projects/${project.id}`)
+    }
   }
 
   return (

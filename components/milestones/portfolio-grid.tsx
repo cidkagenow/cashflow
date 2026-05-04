@@ -10,7 +10,7 @@ interface Milestone {
   amount: number
   daysActive: number
   daysOverdue?: number
-  status: 'exigible' | 'en_mora' | 'notificado' | 'compromiso' | 'pagado'
+  status: string
   lastAction: string
   lastActionDate: string
   responsible: string

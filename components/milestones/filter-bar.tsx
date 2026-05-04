@@ -60,11 +60,18 @@ export function FilterBar({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="todos">Todos los estados</SelectItem>
-              <SelectItem value="exigible">Exigible</SelectItem>
-              <SelectItem value="en_mora">En mora</SelectItem>
-              <SelectItem value="notificado">Notificado</SelectItem>
-              <SelectItem value="compromiso">Compromiso de pago</SelectItem>
-              <SelectItem value="pagado">Pagado</SelectItem>
+              <SelectItem value="Configurado">Configurado</SelectItem>
+              <SelectItem value="Bloqueado">Bloqueado</SelectItem>
+              <SelectItem value="Exigible">Exigible</SelectItem>
+              <SelectItem value="Notificado">Notificado</SelectItem>
+              <SelectItem value="EnMora">En mora</SelectItem>
+              <SelectItem value="CompromisoPago">Compromiso de pago</SelectItem>
+              <SelectItem value="PagadoParcial">Pagado parcial</SelectItem>
+              <SelectItem value="PagoEnRevision">Pago en revisión</SelectItem>
+              <SelectItem value="PagoObservado">Pago observado</SelectItem>
+              <SelectItem value="Pagado">Pagado</SelectItem>
+              <SelectItem value="Conciliado">Conciliado</SelectItem>
+              <SelectItem value="Suspendido">Suspendido</SelectItem>
             </SelectContent>
           </Select>
         </div>

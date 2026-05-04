@@ -19,22 +19,22 @@ export function ValidationAlert({
     <Card
       className={`p-4 border-2 transition-all ${
         isValid
-          ? 'border-green-200 bg-green-50 dark:bg-green-950/20 dark:border-green-900'
-          : 'border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900'
+          ? 'border-emerald-500/30 bg-emerald-500/5'
+          : 'border-red-500/30 bg-red-500/5'
       }`}
     >
       <div className="flex items-start gap-3">
         {isValid ? (
-          <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+          <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" />
         ) : (
-          <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
         )}
         <div className="flex-1">
           <p
             className={`font-semibold text-sm ${
               isValid
-                ? 'text-green-900 dark:text-green-200'
-                : 'text-red-900 dark:text-red-200'
+                ? 'text-emerald-400'
+                : 'text-red-400'
             }`}
           >
             {isValid
@@ -43,8 +43,8 @@ export function ValidationAlert({
           </p>
           <p className={`text-xs mt-1 ${
             isValid
-              ? 'text-green-800 dark:text-green-300'
-              : 'text-red-800 dark:text-red-300'
+              ? 'text-emerald-400/80'
+              : 'text-red-400/80'
           }`}>
             Monto total del proyecto: <span className="font-semibold">${projectTotal.toLocaleString('es-ES')}</span>
             <br />
